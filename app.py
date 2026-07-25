@@ -173,7 +173,7 @@ def build_pdf_report(report,plot_png,warnings):
 
 st.set_page_config(page_title="Vessel Inventory & PST/TTC",page_icon="🛡️",layout="wide")
 st.title("Vessel Inventory and PST / TTC Screening Calculator")
-st.warning("PRELIMINARY ENGINEERING SCREENING ONLY. Verification by qualified Process, Process Safety, and Control Systems engineers is mandatory before design, operation, HAZOP, LOPA, SRS, alarm rationalization, SIS design, or safety-critical use.")
+
 with st.sidebar:
     unit_system=st.selectbox("Unit system",["SI (m, m3, m3/h)","Engineering (mm, m3, m3/h)"]); unit="mm" if unit_system.startswith("Engineering") else "m"; scenario=st.radio("Scenario",["High Level","Low Level"])
 with st.form("inputs"):
