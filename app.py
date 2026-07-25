@@ -249,4 +249,6 @@ if st.session_state.get("pdf_report_bytes"):
 
 with st.expander("Assumptions and Limitations",expanded=True):
     st.write(limitations); st.write("Horizontal head partial volume, torispherical head volume, and kettle bundle displacement are screening approximations. Validate against approved project calculations, vendor data or approved software.")
+
+with st.expander("Developed by Dhawal Patel",expanded=True)
 # Test: valid order; close H/HH; IRT>PST; PDF download; compare PDF and screen values.
