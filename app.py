@@ -1,5 +1,5 @@
 """Vessel Inventory, PST/TTC, Operating Envelope, and PDF Report.
-Preliminary engineering screening only.
+Preliminary engineering screening created by Dhawal Patel.
 """
 from __future__ import annotations
 import math, re
@@ -225,7 +225,7 @@ st.header("Calculation Results"); c=st.columns(5); c[0].metric("Current volume",
 
 st.header("Operating Envelope and PST Visualization")
 plot=create_operating_envelope_plot(levels_d,{k:vol_m.get(k) for k in ["LDL","LL","L","NORMAL","H","HH","UDL"]},unit,tag,levels_d["CURRENT"],hazard_d,effective_d,irt,a,ttt,pst,total,scenario); st.plotly_chart(plot,use_container_width=True)
-st.caption("Generic alarm/trip operating-zone sketch for engineering communication. It is not an approved project drawing or alarm rationalization record.")
+st.caption("Generic alarm/trip operating-zone sketch for engineering communication.")
 
 summary=pd.DataFrame([{"Equipment":tag,"Interlock":ino,"Scenario":scenario,"Current level":levels_d["CURRENT"],"Nominal trip":levels_d["HH" if scenario=="High Level" else "LL"],"Effective trip":effective_d,"Hazard endpoint":hazard_d,"Time to Trip (s)":ttt,"PST/TTC (s)":pst,"IRT (s)":irt,"PST/IRT":a["ratio"],"IRT <= PST/2":a["preferred"],"Status":a["status"],"Safe state":safe,"Success criteria":success}])
 st.header("PST Summary for Control Systems / SRS Input"); st.dataframe(summary.T.rename(columns={0:"Value"}),use_container_width=True); st.download_button("Download CSV Summary",summary.to_csv(index=False).encode(),safe_name(f"{tag}_{ino}_pst_summary.csv"),"text/csv")
@@ -234,7 +234,7 @@ st.header("PDF Calculation Report")
 inputs={"Equipment type":et,"Diameter":f"{D_u:g} {unit}","Straight length":f"{L_u:g} {unit}","Head type / count":f"{ht} / {nh}","Unit system":unit_system,"Density":f"{rho:g} kg/m3" if fu=="kg/h" else "Not used","Current / Normal":f"{current_u:g} / {normal_u:g} {unit}","L / LL":f"{ll_u:g} / {llll_u:g} {unit}","H / HH":f"{h_u:g} / {hh_u:g} {unit}","Lower / Upper design limit":f"{ldl_u:g} / {udl_u:g} {unit}","Low / High hazard":f"{lowhaz_u:g} / {highhaz_u:g} {unit}","Effective trip":f"{effective_d:.3g} {unit}","Tolerance":f"{tv:g} ({tb})","Normal inflow / outflow":f"{ni:.3g} / {no:.3g} m3/h","PST inflow / outflow":f"{pi:.3g} / {po:.3g} m3/h","IRT basis":f"Sensor {sensor:g} + logic {logic:g} + final {final:g} + lag {lag:g} s; method {im}"}
 results={"Current volume":f"{cv:.4f} m3","Normal volume":f"{vol_m['NORMAL']:.4f} m3","L alarm volume":f"{vol_m['L']:.4f} m3","LL trip volume":f"{vol_m['LL']:.4f} m3","H alarm volume":f"{vol_m['H']:.4f} m3","HH trip volume":f"{vol_m['HH']:.4f} m3","Effective trip volume":f"{ev:.4f} m3","Hazard volume":f"{hv:.4f} m3","Time to Trip":f"{ttt:.2f} s" if ttt is not None else "Not available","PST/TTC":f"{pst:.2f} s" if pst is not None else "Not available","Total Time to Hazard":f"{total:.2f} s" if total is not None else "Not available","IRT":f"{irt:.2f} s","PST/IRT ratio":fmt_number(a["ratio"],3),"IRT <= PST/2":"Yes" if a["preferred"] else "No","Assessment":a["status"]}
 srs={"IPL credited":ipl,"Process safe state":safe,"Success criteria":success,"Operating mode":mode,"Calculation basis":basis,"Data source":source,"Assumptions and limitations":limitations}
-report={"Generated":datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S %Z"),"Equipment tag/name":tag,"Interlock number":ino,"Interlock description":idesc,"Scenario":scenario,"Prepared by":prepared or "Not provided","Disclaimer":"This calculation is for preliminary engineering screening only and must be reviewed and approved by qualified Process, Process Safety, and Control Systems engineers before use for design, operation, HAZOP, LOPA, Process SRS, alarm rationalization, SIS design, or any safety-critical decision.","Inputs":inputs,"Results":results,"SRS":srs}
+report={"Generated":datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S %Z"),"Equipment tag/name":tag,"Interlock number":ino,"Interlock description":idesc,"Scenario":scenario,"Prepared by":prepared or "Not provided","Disclaimer":"This calculation is for preliminary engineering screening only and must be reviewed and approved by qualified Process and Control Systems engineers before use.","Inputs":inputs,"Results":results,"SRS":srs}
 if st.button("Generate PDF Report",type="primary",use_container_width=True):
     try:
         png=image_bytes(create_matplotlib_operating_envelope_plot(levels_d,unit,tag,levels_d["CURRENT"],hazard_d,effective_d,a,scenario))
@@ -248,5 +248,5 @@ if st.session_state.get("pdf_report_bytes"):
     st.download_button("Download PDF Report",data=st.session_state["pdf_report_bytes"],file_name=st.session_state["pdf_report_name"],mime="application/pdf",use_container_width=True)
 
 with st.expander("Assumptions and Limitations",expanded=True):
-    st.write(limitations); st.write("Horizontal head partial volume, torispherical head volume, and kettle bundle displacement are screening approximations. Validate against approved project calculations, vendor data, approved software, or dynamic simulation.")
+    st.write(limitations); st.write("Horizontal head partial volume, torispherical head volume, and kettle bundle displacement are screening approximations. Validate against approved project calculations, vendor data or approved software.")
 # Test: valid order; close H/HH; IRT>PST; PDF download; compare PDF and screen values.
